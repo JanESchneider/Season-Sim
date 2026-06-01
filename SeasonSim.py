@@ -1,3 +1,12 @@
+# ******************************************************************
+#   SeasonSim v0.9 - 01.06.2026
+#   Jan-Erik Schneider
+# 
+#   Simple season-simulation tool
+#
+# ******************************************************************
+
+
 # -*- coding: utf-8 -*-
 import os
 os.environ['AUTOBAHN_USE_NVX'] = '0'
@@ -5,14 +14,18 @@ os.environ['AUTOBAHN_USE_NVX'] = '0'
 from vpython import *
 import math
 
-# 1. Setup Scene
+# ******************************************************************
+#  Scene Setup
+# ******************************************************************
 scene = canvas(title="<b>SeasonSim v0.9</b>", 
                width=1000, height=700, background=color.black)
 scene.lights = []
 scene.ambient = color.gray(0.1)
 sun_light = local_light(pos=vector(0,0,0), color=color.white)
 
-# 2. Global State
+# ******************************************************************
+#  Global state variables
+# ******************************************************************
 state = {
     'running': True,
     'orbit_speed': 0.005,
@@ -23,7 +36,9 @@ state = {
 ORBIT_RADIUS = 50
 DAYS_PER_YEAR = 40 
 
-# 3. UI Functions
+# ******************************************************************
+#  Functions setup
+# ******************************************************************
 def toggle_run(b):
     state['running'] = not state['running']
     b.text = "PAUSE" if state['running'] else "START"
@@ -46,13 +61,18 @@ def reset_sim():
     scene.camera.follow(None)
     scene.center = vector(0,0,0)
 
-# 4. DASHBOARD LAYOUT
+# ******************************************************************
+#  Dashboard Layout
+# ******************************************************************
 scene.append_to_caption("<br><b>STEUERUNG</b><br>")
 button(text="PAUSE", bind=toggle_run, background=color.red, color=color.white)
 scene.append_to_caption(" ")
 button(text="Reset", bind=reset_sim)
 
 scene.append_to_caption("<br><br><b>ANSICHT</b><br>")
+
+
+# ******* Watch out, these don't show up! Maybe kick them out later... *********
 
 # --- HOVER FLAG FOR HEMISPHERE ---
 scene.append_to_caption("<span title='Erklärungen der Jahreszeiten relativ für Nord-/Südhalbkugel.'>")
@@ -71,7 +91,9 @@ scene.append_to_caption("<br><br><hr><b>DETAILS</b><br>")
 info_box = wtext(text="<div style='background-color: #1a1a1a; color: #ffffff; padding: 15px; border-radius: 8px; border: 1px solid #444;'>Bereit...</div>") 
 scene.append_to_caption("<br><hr>")
 
-# 5. Objects
+# ******************************************************************
+#  Render Objects (Sun, Earth, ...)
+# ******************************************************************
 sun = sphere(pos=vector(0,0,0), radius=10, color=color.yellow, emissive=True)
 orbit_path = ring(pos=vector(0,0,0), axis=vector(0,1,0), radius=ORBIT_RADIUS, thickness=0.1, color=color.gray(0.4))
 
@@ -95,13 +117,17 @@ def handle_click():
     elif picked == sun: scene.camera.follow(None); scene.center = vector(0,0,0)
 scene.bind('mousedown', handle_click)
 
-# Station Markers
+# ******************************************************************
+#  Station Markers (Solstices, Equinoxes)
+# ******************************************************************
 sphere(pos=vector(50, 0, 0), radius=0.8, color=color.orange) 
 sphere(pos=vector(0, 0, 50), radius=0.8, color=color.cyan)   
 sphere(pos=vector(-50, 0, 0), radius=0.8, color=color.green) 
 sphere(pos=vector(0, 0, -50), radius=0.8, color=color.red)   
 
-# 6. Animation Loop
+# ******************************************************************
+#  Animation
+# ******************************************************************
 while True:
     rate(100)
     if state['running']:
@@ -132,3 +158,5 @@ while True:
             msg = "Die Erde bewegt sich weiter..."
         
         info_box.text = f"<div style='background-color: #1a1a1a; color: #ffffff; padding: 15px; border-radius: 8px; border: 1px solid #444; font-family: sans-serif;'>{msg}</div>"
+
+# ******************************************************************
