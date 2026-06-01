@@ -1,6 +1,6 @@
 # Jahreszeiten-Simulator (Season Simulator)
 
-A Python-based interactive tool to visualize the Earth's orbit around the Sun and understand how seasons change across both hemispheres.
+A Python-based simple interactive tool to visualize the Earth's orbit around the Sun and understand how seasons change across both hemispheres.
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 ![Python](https://img.shields.io/badge/python-3.x-green.svg)
@@ -19,3 +19,9 @@ This tool provides a simplified 3D/2D visualization of the Earth's movement arou
   - **Earth-centered view:** Click on the Earth to zoom in and see the sunlight distribution up close.
 - **Educational Pop-ups:** Information appears automatically when the Earth reaches solstices or equinoxes.
 - **Hemisphere Toggle:** Switch descriptions to focus on either the Northern or Southern Hemisphere perspective.
+
+## Planned
+- **English Language support:** Toggle between German and English interface.
+- **Labels explaining the tropics and arctic cirles:** More information in the viewport.
+- **Interactive Equinox and Solstice positions:** More information on the key positions along the orbit.
+- **Moon phases:** Adding the Moon to have a separate explanation on the moon phases.
