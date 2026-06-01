@@ -100,7 +100,7 @@ orbit_path = ring(pos=vector(0,0,0), axis=vector(0,1,0), radius=ORBIT_RADIUS, th
 tilt_angle = radians(23.4)
 tilt_axis = rotate(vector(0,1,0), angle=tilt_angle, axis=vector(1,0,0))
 
-earth = sphere(pos=vector(ORBIT_RADIUS, 0, 0), radius=2, texture=textures.earth, shininess=0, up=tilt_axis)
+earth = sphere(pos=vector(ORBIT_RADIUS, 0, 0), radius=2, texture=textures.earth, shininess=0)
 earth_axis = cylinder(axis=tilt_axis * 6, radius=0.05, color=color.white)
 
 earth_lines = []
