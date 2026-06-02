@@ -16,7 +16,59 @@ import math
 # ******************************************************************
 #  Scene Setup
 # ******************************************************************
-scene = canvas(title="<h1 style='color:white; font-family:sans-serif;'>SeasonSim v0.9</h1>", 
+title_html = """
+<div style='max-width: 1000px; background-color: #1a1a1a; color: white; padding: 15px; 
+            border-radius: 8px; border: 1px solid #444; font-family: sans-serif; 
+            box-sizing: border-box; overflow-wrap: break-word; word-wrap: break-word; margin-top:0; margin-bottom: 5px;'>
+    <h1 style='margin: 0; color: #ffcc00; font-size: 24px;'>SeasonSim v0.9a</h1>
+
+    <details style='background-color: #1a1a1a; color: #e0e0e0; padding: 10px; border-radius: 8px; border: 1px solid #444; cursor: pointer; box-sizing: border-box;'>
+        <summary style='color: #ffcc00; font-weight: bold;'>Allgemeine Erklärungen</summary>
+        Dieser Simulator stellt vereinfacht den Umlauf der Erde um die Sonne im Jahresverlauf dar. Durch die Neigung der Erdachse (um 23,4°) relativ
+        zur sogenannten <b>Ekliptik</b> (der Ebene in welcher die Planeten die Sonne umkreisen) ist die Sonneneinstrahlung über das Jahr auf den Halbkugeln
+        unterschiedlich. Durch diesen von uns als "Sonnenstand" wahrgenommenen Effekt entstehen die Jahreszeiten.
+
+        Der Bereich zwischen dem nördlichen und südlichen <b>Wendekreis</b> (die gelben Linien auf der Erde bei jeweils ca. 23° nördlicher/südlicher Breite)
+        werden <b>Tropen</b> genannt. Die Sonne steht zur Juni-Sonnenwende über dem nördlichen Wendekreis im Zenit (das heißt senkrecht über 
+        dem Beobachter) - auf der Nordhalbkugel beginnt der Sommer, auf der Südhalbkugel der Winter. Zur Dezember-Sonnenwende steht die Sonne 
+        dann über dem südlichen Wendekreis im Zenit. In den Tropen ist die Tageslänge ganzjährig ungefähr gleich, es gibt hier daher keine 
+        ausgeprägten Jahreszeiten. Das Jahr wird lediglich in eine Regen- und eine Trockenzeit eingeteilt.
+
+        An den sogenannten <b>Polarkreisen</b> (die hellblauen Linien auf der Erde) bei ca. 66° nördlicher/südlicher Breite geht die Sonne zu den Sonnenwenden
+        gerade nicht mehr auf bzw. unter. Beispielsweise herrscht nördlich des nördlichen Polarkreises zur Dezember-Sonnenwende Polarnacht - die Sonne
+        geht dann dort nicht mehr auf. Gleiches gilt zur Juni-Sonnenwende: die Sonne ist 24 Stunden lang über dem Horizont - es herrscht Polartag.
+
+        Die farbigen Punkte entlang des Erdorbits markieren die Positionen an welchen die Sonnenwenden und Tagundnachtgleichen eintreten. 
+        Ein Klick auf den jeweiligen Punkt blendet die Beschriftung aus. Ein erneuter Klick darauf blendet sie wieder ein.
+    </details>
+
+    <details style='background-color: #1a1a1a; color: #e0e0e0; padding: 10px; border-radius: 8px; border: 1px solid #444; cursor: pointer; box-sizing: border-box;'>
+        <summary style='color: #ffcc00; font-weight: bold;'> Hilfe & Steuerung (Klicken zum Ausklappen)</summary>
+        <div style='display: flex; flex-wrap: wrap; justify-content: space-between; font-size: 0.85em; margin-top: 10px; border-top: 1px solid #333; padding-top: 10px;'>
+            <div style='flex: 1; min-width: 280px; padding: 5px;'>
+                <b>Navigation:</b><br>
+                <b>Ansicht drehen</b>: Rechte Maustaste Halten & Ziehen.
+                <b>Ansicht bewegen</b>: Shift + Linke Maustaste Halten & Ziehen 
+                (nur wenn Ansicht auf Sonne zentriert).
+                <b>Zoom</b>: Mausrad.            
+            </div>
+            <div style='flex: 1; min-width: 280px; padding: 5px;'>
+                <b>Interaktion:</b><br>
+                <b>Klick auf Erde/Sonne</b>: Zentriert Ansicht auf das Objekt.
+                <b>Linien Ein/Aus</b>: Einblenden von Äquator, Wendekreisen und
+                Polarkreisen. Klick auf den jew. Kreis blendet den Namen ein.
+                <b>Springe zu</b>: Setze die Simulation auf den entsprechenden Punkt.
+            </div>
+        </div>
+    Zur besseren Übersicht: Simulation pausieren, dann die Ansicht auf die Erde zentrieren (auf die Erde klicken). Nun kann man mit "Springe zu" 
+    zu den jeweiligen Positionen wechseln und die Erklärungen lesen. Dabei kann man anhand des Erdmodells die Sonneneinstrahlung auf die Erde 
+    mit Hilfe der Breitenkreise beobachten. Per Klick auf die Breitenkreise kann man ihren Namen ein- und ausblenden.
+    </details>
+</div>
+"""
+scene.append_to_title(title_html)
+
+scene = canvas(title=title_html, 
                width=1000, height=700, background=color.black)
 scene.lights = []
 scene.ambient = color.gray(0.1)
@@ -70,67 +122,12 @@ def reset_sim():
 #  Dashboard Layout
 # ******************************************************************
 
-introductory_text = """
-<div style='max-width: 1000px; font-family: sans-serif; margin-bottom: 10px; box-sizing: border-box;'>
-    <details style='background-color: #1a1a1a; color: #e0e0e0; padding: 10px; border-radius: 8px; border: 1px solid #444; cursor: pointer; box-sizing: border-box;'>
-        <summary style='color: #ffcc00; font-weight: bold;'>Allgemeine Erklärungen</summary>
-        Dieser Simulator stellt vereinfacht den Umlauf der Erde um die Sonne im Jahresverlauf dar. Durch die Neigung der Erdachse (um 23,4°) relativ
-        zur sogenannten <b>Ekliptik</b> (der Ebene in welcher die Planeten die Sonne umkreisen) ist die Sonneneinstrahlung über das Jahr auf den Halbkugeln
-        unterschiedlich. Durch diesen von uns als "Sonnenstand" wahrgenommenen Effekt entstehen die Jahreszeiten.
-
-        Der Bereich zwischen dem nördlichen und südlichen <b>Wendekreis</b> (die gelben Linien auf der Erde bei jeweils ca. 23° nördlicher/südlicher Breite)
-        werden <b>Tropen</b> genannt. Die Sonne steht zur Juni-Sonnenwende über dem nördlichen Wendekreis im Zenit (das heißt senkrecht über dem Beobachter) 
-        - auf der Nordhalbkugel beginnt der Sommer, auf der Südhalbkugel der Winter. Zur Dezember-Sonnenwende steht die Sonne dann über dem südlichen 
-        Wendekreis im Zenit. In den Tropen ist die Tageslänge ganzjährig ungefähr gleich, es gibt hier daher keine ausgeprägten Jahreszeiten.
-        Das Jahr wird lediglich in eine Regen- und eine Trockenzeit eingeteilt.
-
-        An den sogenannten <b>Polarkreisen</b> (die hellblauen Linien auf der Erde) bei ca. 66° nördlicher/südlicher Breite geht die Sonne zu den Sonnenwenden
-        gerade nicht mehr auf bzw. unter. Beispielsweise herrscht nördlich des nördlichen Polarkreises zur Dezember-Sonnenwende Polarnacht - die Sonne
-        geht dann dort nicht mehr auf. Gleiches gilt zur Juni-Sonnenwende: die Sonne ist 24 Stunden lang über dem Horizont - es herrscht Polartag.
-
-        Die farbigen Punkte entlang des Erdorbits markieren die Positionen an welchen die Sonnenwenden und Tagundnachtgleichen eintreten. 
-        Ein Klick auf den jeweiligen Punkt blendet die Beschriftung aus. Ein erneuter Klick darauf blendet sie wieder ein.
-    </details>
-</div>
-"""
-scene.append_to_title(introductory_text)
-
-
-help_text = """
-<div style='max-width: 1000px; font-family: sans-serif; margin-bottom: 10px; box-sizing: border-box;'>
-    <details style='background-color: #1a1a1a; color: #e0e0e0; padding: 10px; border-radius: 8px; border: 1px solid #444; cursor: pointer; box-sizing: border-box;'>
-        <summary style='color: #ffcc00; font-weight: bold;'> Hilfe & Steuerung (Klicken zum Ausklappen)</summary>
-        <div style='display: flex; flex-wrap: wrap; justify-content: space-between; font-size: 0.85em; margin-top: 10px; border-top: 1px solid #333; padding-top: 10px;'>
-            <div style='flex: 1; min-width: 280px; padding: 5px;'>
-                <b>Navigation:</b><br>
-                <b>Ansicht drehen</b>: Rechte Maustaste Halten & Ziehen.
-                <b>Ansicht bewegen</b>: Shift + Linke Maustaste Halten & Ziehen 
-                (nur wenn Ansicht auf Sonne zentriert).
-                <b>Zoom</b>: Mausrad.            
-            </div>
-            <div style='flex: 1; min-width: 280px; padding: 5px;'>
-                <b>Interaktion:</b><br>
-                <b>Klick auf Erde/Sonne</b>: Zentriert Ansicht auf das Objekt.
-                <b>Linien Ein/Aus</b>: Einblenden von Äquator, Wendekreisen und
-                Polarkreisen. Klick auf den jew. Kreis blendet den Namen ein.
-                <b>Springe zu</b>: Setze die Simulation auf den entsprechenden Punkt.
-            </div>
-        </div>
-    Zur besseren Übersicht: Simulation pausieren, dann die Ansicht auf die Erde zentrieren (auf die Erde klicken). Nun kann man mit "Springe zu" 
-    zu den jeweiligen Positionen wechseln und die Erklärungen lesen. Dabei kann man anhand des Erdmodells die Sonneneinstrahlung auf die Erde 
-    mit Hilfe der Breitenkreise beobachten. Per Klick auf die Breitenkreise kann man ihren Namen ein- und ausblenden.
-    </details>
-</div>
-"""
-scene.append_to_title(help_text)
-
 scene.append_to_caption("<br><b>Steuerung</b><br>")
 button(text="Pause", bind=toggle_run, background=color.red, color=color.white)
 scene.append_to_caption(" ")
 button(text="Simulation Zurücksetzen", bind=reset_sim)
 
 scene.append_to_caption("<br><br><b>Ansicht</b><br>")
-
 
 # ******* Watch out, these don't show up! Maybe kick them out later... *********
 
@@ -162,6 +159,7 @@ scene.append_to_caption(" ")
 button(text="Mär (Äquin.)", bind=lambda: jump_to(pi))
 scene.append_to_caption(" ")
 button(text="Jun (Wende)", bind=lambda: jump_to(1.5*pi))
+scene.append_to_caption("<br><hr>")
 
 # ******************************************************************
 #  Render Objects (Sun, Earth, ...)
