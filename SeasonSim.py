@@ -14,55 +14,65 @@ from vpython import *
 import math
 
 # ******************************************************************
-#  Scene Setup
+#  Scene Setup and Explanations
 # ******************************************************************
 title_html = """
-<div style='max-width: 1000px; background-color: #1a1a1a; color: white; padding: 15px; 
+<div style='width: 100%; max-width: 900px; background-color: #1a1a1a; color: white; padding: 15px; 
             border-radius: 8px; border: 1px solid #444; font-family: sans-serif; 
-            box-sizing: border-box; overflow-wrap: break-word; word-wrap: break-word; margin-top:0; margin-bottom: 5px;'>
-    <h1 style='margin: 0; color: #ffcc00; font-size: 24px;'>SeasonSim v0.9a</h1>
+            box-sizing: border-box; margin-bottom: 10px; overflow-x: hidden;'>
+    
+    <h1 style='margin: 0 0 10px 0; color: #ffcc00; font-size: 22px;'>SeasonSim v0.9a</h1>
 
-    <details style='background-color: #1a1a1a; color: #e0e0e0; padding: 10px; border-radius: 8px; border: 1px solid #444; cursor: pointer; box-sizing: border-box;'>
+    <details open style='width: 100%; background-color: #1a1a1a; color: #e0e0e0; padding: 10px; 
+                         border-radius: 8px; border: 1px solid #444; cursor: pointer; 
+                         box-sizing: border-box; margin-bottom: 10px;'>
         <summary style='color: #ffcc00; font-weight: bold;'>Allgemeine Erklärungen</summary>
-        Dieser Simulator stellt vereinfacht den Umlauf der Erde um die Sonne im Jahresverlauf dar. Durch die Neigung der Erdachse (um 23,4°) relativ
-        zur sogenannten <b>Ekliptik</b> (der Ebene in welcher die Planeten die Sonne umkreisen) ist die Sonneneinstrahlung über das Jahr auf den Halbkugeln
-        unterschiedlich. Durch diesen von uns als "Sonnenstand" wahrgenommenen Effekt entstehen die Jahreszeiten.
-
-        Der Bereich zwischen dem nördlichen und südlichen <b>Wendekreis</b> (die gelben Linien auf der Erde bei jeweils ca. 23° nördlicher/südlicher Breite)
-        werden <b>Tropen</b> genannt. Die Sonne steht zur Juni-Sonnenwende über dem nördlichen Wendekreis im Zenit (das heißt senkrecht über 
-        dem Beobachter) - auf der Nordhalbkugel beginnt der Sommer, auf der Südhalbkugel der Winter. Zur Dezember-Sonnenwende steht die Sonne 
-        dann über dem südlichen Wendekreis im Zenit. In den Tropen ist die Tageslänge ganzjährig ungefähr gleich, es gibt hier daher keine 
-        ausgeprägten Jahreszeiten. Das Jahr wird lediglich in eine Regen- und eine Trockenzeit eingeteilt.
-
-        An den sogenannten <b>Polarkreisen</b> (die hellblauen Linien auf der Erde) bei ca. 66° nördlicher/südlicher Breite geht die Sonne zu den Sonnenwenden
-        gerade nicht mehr auf bzw. unter. Beispielsweise herrscht nördlich des nördlichen Polarkreises zur Dezember-Sonnenwende Polarnacht - die Sonne
-        geht dann dort nicht mehr auf. Gleiches gilt zur Juni-Sonnenwende: die Sonne ist 24 Stunden lang über dem Horizont - es herrscht Polartag.
-
-        Die farbigen Punkte entlang des Erdorbits markieren die Positionen an welchen die Sonnenwenden und Tagundnachtgleichen eintreten. 
-        Ein Klick auf den jeweiligen Punkt blendet die Beschriftung aus. Ein erneuter Klick darauf blendet sie wieder ein.
+        <div style='width: 100%; white-space: normal; overflow-wrap: break-word; 
+                    word-wrap: break-word; word-break: break-word; line-height: 1.4; 
+                    margin-top: 10px; display: block;'>
+            Dieser Simulator stellt vereinfacht den Umlauf der Erde um die Sonne im Jahresverlauf dar. 
+            Durch die Neigung der Erdachse (um 23,4°) relativ zur sogenannten <b>Ekliptik</b> 
+            (der Ebene in welcher die Planeten die Sonne umkreisen) ist die Sonneneinstrahlung 
+            über das Jahr auf den Halbkugeln unterschiedlich. Durch diesen von uns als "Sonnenstand" 
+            wahrgenommenen Effekt entstehen die Jahreszeiten.
+            <br><br>
+            Der Bereich zwischen dem nördlichen und südlichen <b>Wendekreis</b> (gelbe Linien) 
+            wird <b>Tropen</b> genannt. Zur Juni-Sonnenwende steht die Sonne über dem nördlichen 
+            Wendekreis im Zenit - auf der Nordhalbkugel beginnt der Sommer. Zur Dezember-Sonnenwende 
+            über dem südlichen Wendekreis.
+            <br><br>
+            An den <b>Polarkreisen</b> (hellblaue Linien) geht die Sonne zu den Sonnenwenden 
+            gerade nicht mehr auf bzw. unter (Polarnacht/Polartag).
+        </div>
     </details>
 
-    <details style='background-color: #1a1a1a; color: #e0e0e0; padding: 10px; border-radius: 8px; border: 1px solid #444; cursor: pointer; box-sizing: border-box;'>
-        <summary style='color: #ffcc00; font-weight: bold;'> Hilfe & Steuerung (Klicken zum Ausklappen)</summary>
-        <div style='display: flex; flex-wrap: wrap; justify-content: space-between; font-size: 0.85em; margin-top: 10px; border-top: 1px solid #333; padding-top: 10px;'>
-            <div style='flex: 1; min-width: 280px; padding: 5px;'>
-                <b>Navigation:</b><br>
-                <b>Ansicht drehen</b>: Rechte Maustaste Halten & Ziehen.
-                <b>Ansicht bewegen</b>: Shift + Linke Maustaste Halten & Ziehen 
-                (nur wenn Ansicht auf Sonne zentriert).
-                <b>Zoom</b>: Mausrad.            
+    <details style='width: 100%; background-color: #1a1a1a; color: #e0e0e0; padding: 10px; 
+                    border-radius: 8px; border: 1px solid #444; cursor: pointer; 
+                    box-sizing: border-box;'>
+        <summary style='color: #ffcc00; font-weight: bold;'>Hilfe & Steuerung</summary>
+        
+        <div style='display: flex; flex-wrap: wrap; width: 100%; margin-top: 10px; 
+                    border-top: 1px solid #333; padding-top: 10px; gap: 10px;'>
+            
+            <div style='flex: 1; min-width: 200px; max-width: 100%; white-space: normal;'>
+                <b style="color: #ffcc00;">Navigation:</b><br>
+                • <b>Ansicht drehen</b>: Rechtsklick + Ziehen<br>
+                • <b>Ansicht bewegen</b>: Shift + Linksklick<br>
+                • <b>Zoom</b>: Mausrad
             </div>
-            <div style='flex: 1; min-width: 280px; padding: 5px;'>
-                <b>Interaktion:</b><br>
-                <b>Klick auf Erde/Sonne</b>: Zentriert Ansicht auf das Objekt.
-                <b>Linien Ein/Aus</b>: Einblenden von Äquator, Wendekreisen und
-                Polarkreisen. Klick auf den jew. Kreis blendet den Namen ein.
-                <b>Springe zu</b>: Setze die Simulation auf den entsprechenden Punkt.
+            
+            <div style='flex: 1; min-width: 200px; max-width: 100%; white-space: normal;'>
+                <b style="color: #ffcc00;">Interaktion:</b><br>
+                • <b>Klick auf Erde/Sonne</b>: Fokus setzen<br>
+                • <b>Linien</b>: Einblenden von Äquator/Wendekreisen<br>
+                • <b>Springe zu</b>: Vordefinierte Daten wählen
             </div>
+
         </div>
-    Zur besseren Übersicht: Simulation pausieren, dann die Ansicht auf die Erde zentrieren (auf die Erde klicken). Nun kann man mit "Springe zu" 
-    zu den jeweiligen Positionen wechseln und die Erklärungen lesen. Dabei kann man anhand des Erdmodells die Sonneneinstrahlung auf die Erde 
-    mit Hilfe der Breitenkreise beobachten. Per Klick auf die Breitenkreise kann man ihren Namen ein- und ausblenden.
+        <div style="width: 100%; margin-top: 10px; font-size: 0.85em; color: #bbb; border-top: 1px solid #333; padding-top: 5px;">
+            Zur besseren Übersicht: Simulation pausieren, dann die Ansicht auf die Erde zentrieren. 
+            Nun kann man mit "Springe zu" die Positionen wechseln.
+        </div>
     </details>
 </div>
 """
@@ -142,12 +152,6 @@ scene.append_to_caption("</span>")
 scene.append_to_caption("<br><br><b>Umlauf/Rotationsgeschwindigkeit</b><br>")
 speed_slider = slider(min=0, max=0.02, value=0.001, bind=set_speed)
 
-scene.append_to_caption("<br><br><hr><b>Erklärungen</b><br>")
-info_box = wtext(text="<div style='background-color: #1a1a1a; color: #ffffff; padding: 15px; border-radius: 8px; border: 1px solid #444;'>Bereit...</div>") 
-scene.append_to_caption("<br><hr>")
-
-# *********************************************************************************
-
 def jump_to(angle):
     state['theta'] = angle
 
@@ -159,6 +163,9 @@ scene.append_to_caption(" ")
 button(text="Mär (Äquin.)", bind=lambda: jump_to(pi))
 scene.append_to_caption(" ")
 button(text="Jun (Wende)", bind=lambda: jump_to(1.5*pi))
+
+scene.append_to_caption("<br><br><hr><b>Erklärungen</b><br>")
+info_box = wtext(text="<div style='background-color: #1a1a1a; color: #ffffff; padding: 15px; border-radius: 8px; border: 1px solid #444;'>Bereit...</div>") 
 scene.append_to_caption("<br><hr>")
 
 # ******************************************************************
