@@ -17,7 +17,7 @@ import math
 # ******************************************************************
 #  Scene Setup
 # ******************************************************************
-scene = canvas(title="<b>SeasonSim v0.9</b>", 
+scene = canvas(title="<h1 style='color:white; font-family:sans-serif;'>SeasonSim v0.9</h1>", 
                width=1000, height=700, background=color.black)
 scene.lights = []
 scene.ambient = color.gray(0.1)
@@ -28,10 +28,10 @@ sun_light = local_light(pos=vector(0,0,0), color=color.white)
 # ******************************************************************
 state = {
     'running': True,
-    'orbit_speed': 0.005,
-    'show_lines': False,
+    'orbit_speed': 0.001,
+    'show_lines': True,
     'focus_north': True,
-    'theta': 0
+    'theta': pi
 }
 ORBIT_RADIUS = 50
 DAYS_PER_YEAR = 40 
@@ -49,7 +49,11 @@ def set_speed(s):
 
 def toggle_lines(b):
     state['show_lines'] = not state['show_lines']
-    for line in earth_lines: line.visible = state['show_lines']
+    for line in earth_lines: 
+        line.visible = state['show_lines']
+        if not state['show_lines']:
+            line.my_label.visible = False
+            
     b.text = "Linien: AN" if state['show_lines'] else "Linien: AUS"
 
 def toggle_hem(b):
@@ -57,39 +61,108 @@ def toggle_hem(b):
     b.text = "Fokus: NORD" if state['focus_north'] else "Fokus: SÜD"
 
 def reset_sim():
-    state['theta'] = 0
+    state['theta'] = pi
     scene.camera.follow(None)
     scene.center = vector(0,0,0)
+    speed_slider.value = 0.001
+    state['orbit_speed'] = 0.001
 
 # ******************************************************************
 #  Dashboard Layout
 # ******************************************************************
-scene.append_to_caption("<br><b>STEUERUNG</b><br>")
-button(text="PAUSE", bind=toggle_run, background=color.red, color=color.white)
-scene.append_to_caption(" ")
-button(text="Reset", bind=reset_sim)
 
-scene.append_to_caption("<br><br><b>ANSICHT</b><br>")
+introductory_text = """
+<div style='max-width: 1000px; font-family: sans-serif; margin-bottom: 10px; box-sizing: border-box;'>
+    <details style='background-color: #1a1a1a; color: #e0e0e0; padding: 10px; border-radius: 8px; border: 1px solid #444; cursor: pointer; box-sizing: border-box;'>
+        <summary style='color: #ffcc00; font-weight: bold;'>Allgemeine Erklärungen</summary>
+        Dieser Simulator stellt vereinfacht den Umlauf der Erde um die Sonne im Jahresverlauf dar. Durch die Neigung der Erdachse (um 23,4°) relativ
+        zur sogenannten <b>Ekliptik</b> (der Ebene in welcher die Planeten die Sonne umkreisen) ist die Sonneneinstrahlung über das Jahr auf den Halbkugeln
+        unterschiedlich. Durch diesen von uns als "Sonnenstand" wahrgenommenen Effekt entstehen die Jahreszeiten.
+
+        Der Bereich zwischen dem nördlichen und südlichen <b>Wendekreis</b> (die gelben Linien auf der Erde bei jeweils ca. 23° nördlicher/südlicher Breite)
+        werden <b>Tropen</b> genannt. Die Sonne steht zur Juni-Sonnenwende über dem nördlichen Wendekreis im Zenit (das heißt senkrecht über dem Beobachter) 
+        - auf der Nordhalbkugel beginnt der Sommer, auf der Südhalbkugel der Winter. Zur Dezember-Sonnenwende steht die Sonne dann über dem südlichen 
+        Wendekreis im Zenit. In den Tropen ist die Tageslänge ganzjährig ungefähr gleich, es gibt hier daher keine ausgeprägten Jahreszeiten.
+        Das Jahr wird lediglich in eine Regen- und eine Trockenzeit eingeteilt.
+
+        An den sogenannten <b>Polarkreisen</b> (die hellblauen Linien auf der Erde) bei ca. 66° nördlicher/südlicher Breite geht die Sonne zu den Sonnenwenden
+        gerade nicht mehr auf bzw. unter. Beispielsweise herrscht nördlich des nördlichen Polarkreises zur Dezember-Sonnenwende Polarnacht - die Sonne
+        geht dann dort nicht mehr auf. Gleiches gilt zur Juni-Sonnenwende: die Sonne ist 24 Stunden lang über dem Horizont - es herrscht Polartag.
+
+        Die farbigen Punkte entlang des Erdorbits markieren die Positionen an welchen die Sonnenwenden und Tagundnachtgleichen eintreten. 
+        Ein Klick auf den jeweiligen Punkt blendet die Beschriftung aus. Ein erneuter Klick darauf blendet sie wieder ein.
+    </details>
+</div>
+"""
+scene.append_to_title(introductory_text)
+
+
+help_text = """
+<div style='max-width: 1000px; font-family: sans-serif; margin-bottom: 10px; box-sizing: border-box;'>
+    <details style='background-color: #1a1a1a; color: #e0e0e0; padding: 10px; border-radius: 8px; border: 1px solid #444; cursor: pointer; box-sizing: border-box;'>
+        <summary style='color: #ffcc00; font-weight: bold;'> Hilfe & Steuerung (Klicken zum Ausklappen)</summary>
+        <div style='display: flex; flex-wrap: wrap; justify-content: space-between; font-size: 0.85em; margin-top: 10px; border-top: 1px solid #333; padding-top: 10px;'>
+            <div style='flex: 1; min-width: 280px; padding: 5px;'>
+                <b>Navigation:</b><br>
+                <b>Ansicht drehen</b>: Rechte Maustaste Halten & Ziehen.
+                <b>Ansicht bewegen</b>: Shift + Linke Maustaste Halten & Ziehen 
+                (nur wenn Ansicht auf Sonne zentriert).
+                <b>Zoom</b>: Mausrad.            
+            </div>
+            <div style='flex: 1; min-width: 280px; padding: 5px;'>
+                <b>Interaktion:</b><br>
+                <b>Klick auf Erde/Sonne</b>: Zentriert Ansicht auf das Objekt.
+                <b>Linien Ein/Aus</b>: Einblenden von Äquator, Wendekreisen und
+                Polarkreisen. Klick auf den jew. Kreis blendet den Namen ein.
+                <b>Springe zu</b>: Setze die Simulation auf den entsprechenden Punkt.
+            </div>
+        </div>
+    Zur besseren Übersicht: Simulation pausieren, dann die Ansicht auf die Erde zentrieren (auf die Erde klicken). Nun kann man mit "Springe zu" 
+    zu den jeweiligen Positionen wechseln und die Erklärungen lesen. Dabei kann man anhand des Erdmodells die Sonneneinstrahlung auf die Erde 
+    mit Hilfe der Breitenkreise beobachten. Per Klick auf die Breitenkreise kann man ihren Namen ein- und ausblenden.
+    </details>
+</div>
+"""
+scene.append_to_title(help_text)
+
+scene.append_to_caption("<br><b>Steuerung</b><br>")
+button(text="Pause", bind=toggle_run, background=color.red, color=color.white)
+scene.append_to_caption(" ")
+button(text="Simulation Zurücksetzen", bind=reset_sim)
+
+scene.append_to_caption("<br><br><b>Ansicht</b><br>")
 
 
 # ******* Watch out, these don't show up! Maybe kick them out later... *********
 
-# --- HOVER FLAG FOR HEMISPHERE ---
 scene.append_to_caption("<span title='Erklärungen der Jahreszeiten relativ für Nord-/Südhalbkugel.'>")
 button(text="Fokus: NORD", bind=toggle_hem)
 scene.append_to_caption("</span> ")
 
-# --- HOVER FLAG FOR LINES ---
 scene.append_to_caption("<span title='Ein- und Ausblenden von Äquator (weiß), Wendekreisen (gelb) und Polarkreisen (cyan).'>")
-button(text="Linien: AUS", bind=toggle_lines)
+button(text="Linien: EIN", bind=toggle_lines)
 scene.append_to_caption("</span>")
 
-scene.append_to_caption("<br><br><b>GESCHWINDIGKEIT</b><br>")
-slider(min=0, max=0.02, value=0.005, bind=set_speed)
+scene.append_to_caption("<br><br><b>Umlauf/Rotationsgeschwindigkeit</b><br>")
+speed_slider = slider(min=0, max=0.02, value=0.001, bind=set_speed)
 
-scene.append_to_caption("<br><br><hr><b>DETAILS</b><br>")
+scene.append_to_caption("<br><br><hr><b>Erklärungen</b><br>")
 info_box = wtext(text="<div style='background-color: #1a1a1a; color: #ffffff; padding: 15px; border-radius: 8px; border: 1px solid #444;'>Bereit...</div>") 
 scene.append_to_caption("<br><hr>")
+
+# *********************************************************************************
+
+def jump_to(angle):
+    state['theta'] = angle
+
+scene.append_to_caption("<br><br><b>Springe zu</b><br>")
+button(text="Sep (Äquin.)", bind=lambda: jump_to(0))
+scene.append_to_caption(" ")
+button(text="Dez (Wende)", bind=lambda: jump_to(pi/2))
+scene.append_to_caption(" ")
+button(text="Mär (Äquin.)", bind=lambda: jump_to(pi))
+scene.append_to_caption(" ")
+button(text="Jun (Wende)", bind=lambda: jump_to(1.5*pi))
 
 # ******************************************************************
 #  Render Objects (Sun, Earth, ...)
@@ -105,58 +178,99 @@ earth_axis = cylinder(axis=tilt_axis * 6, radius=0.05, color=color.white)
 
 earth_lines = []
 lats = [0, 23.4, -23.4, 66.6, -66.6]
+line_names = ["Äquator", "Nördl. Wendekreis", "Südl. Wendekreis", "Nördl. Polarkreis", "Südl. Polarkreis"]
 cols = [color.white, color.yellow, color.yellow, color.cyan, color.cyan]
+
 for i in range(5):
     lat_rad = radians(lats[i])
-    L = ring(axis=tilt_axis, radius=(2 * cos(lat_rad)) * 1.01, thickness=0.03, color=cols[i], visible=False)
+    L = ring(axis=tilt_axis, radius=(2 * cos(lat_rad)) * 1.01, thickness=0.03, color=cols[i], visible=True)
+    L.my_lat = lats[i] 
+    
+    L.my_label = label(text=line_names[i], height=10, border=2, 
+                       box=False, line=False, opacity=0,
+                       visible=False, color=cols[i],
+                       xoffset=10, align='left')
+    
+    earth_lines.append(L)
+    
     earth_lines.append(L)
 
 def handle_click():
     picked = scene.mouse.pick
     if picked == earth: scene.camera.follow(earth)
     elif picked == sun: scene.camera.follow(None); scene.center = vector(0,0,0)
+    
+    elif hasattr(picked, 'my_label'):
+        picked.my_label.visible = not picked.my_label.visible
+        
 scene.bind('mousedown', handle_click)
 
 # ******************************************************************
 #  Station Markers (Solstices, Equinoxes)
 # ******************************************************************
-sphere(pos=vector(50, 0, 0), radius=0.8, color=color.orange) 
-sphere(pos=vector(0, 0, 50), radius=0.8, color=color.cyan)   
-sphere(pos=vector(-50, 0, 0), radius=0.8, color=color.green) 
-sphere(pos=vector(0, 0, -50), radius=0.8, color=color.red)   
+stations = [
+    {'pos': vector(50, 0, 0), 'color': color.orange, 'name': 'Tagundnachtgleiche\n(September)'},
+    {'pos': vector(0, 0, 50), 'color': color.cyan,   'name': 'Sonnenwende\n(Dezember)'},
+    {'pos': vector(-50, 0, 0), 'color': color.green,  'name': 'Tagundnachtgleiche\n(März)'},
+    {'pos': vector(0, 0, -50), 'color': color.red,    'name': 'Sonnenwende\n(Juni)'}
+]
+
+station_objects = []
+
+for s in stations:
+    m = sphere(pos=s['pos'], radius=0.8, color=s['color'])
+    
+    m.my_label = label(pos=s['pos'], text=s['name'], 
+                       xoffset=20, yoffset=20, space=30, 
+                       height=12, border=4, font='sans',
+                       visible=True, opacity=0.3)
+    
+    station_objects.append(m)
 
 # ******************************************************************
 #  Animation
 # ******************************************************************
 while True:
     rate(100)
+    
     if state['running']:
         state['theta'] += state['orbit_speed']
         if state['theta'] > 2 * pi: state['theta'] -= 2 * pi 
+    
+    t = state['theta']
+    earth.pos = vector(ORBIT_RADIUS * cos(t), 0, ORBIT_RADIUS * sin(t))
+    earth_axis.pos = earth.pos - (tilt_axis * 3)
+    
+    t = state['theta']
+    earth.pos = vector(ORBIT_RADIUS * cos(t), 0, ORBIT_RADIUS * sin(t))
+    earth_axis.pos = earth.pos - (tilt_axis * 3)
+    
+    label_offset_dir = vector(0, 0, 1) 
+
+    surface_direction = vector(1, 0, 0)
+
+    for line in earth_lines:
+        line.pos = earth.pos + tilt_axis * (2 * sin(radians(line.my_lat)))
+        line.axis = tilt_axis
         
-        t = state['theta']
-        earth.pos = vector(ORBIT_RADIUS * cos(t), 0, ORBIT_RADIUS * sin(t))
-        earth_axis.pos = earth.pos - (tilt_axis * 3)
-        
-        for i, line in enumerate(earth_lines):
-            line.pos = earth.pos + tilt_axis * (2 * sin(radians(lats[i])))
-            line.axis = tilt_axis
+        if hasattr(line, 'my_label'):
+            line.my_label.pos = line.pos + surface_direction * line.radius
             
+    if state['running']:
         earth.rotate(angle=state['orbit_speed'] * DAYS_PER_YEAR, axis=tilt_axis, origin=earth.pos)
         
-        # Info Logic
-        msg = ""
-        if 0 <= t < 0.2 or t > 6.1:
-            msg = "<b>Tagundnachtgleiche (September):</b> " + ("Sonne im Zenit über dem Äquator - Herbstanfang. Weltweit gleiche Tageslänge." if state['focus_north'] else "Sonne im Zenit über dem Äquator - Frühlingsanfang. Weltweit gleiche Tageslänge.")
-        elif 1.3 < t < 1.8:
-            msg = "<b>Sonnenwende (Dezember):</b> " + ("Sonne im Zenit über dem südlichen Wendekreis - Kürzester Tag, längste Nacht. </br> Die Sonne geht nördlich des nördlichen Polarkreises nicht mehr auf - Polarnacht." if state['focus_north'] else "Sonne im Zenit über dem südlichen Wendekreis - Kürzeste Nacht, längster Tag. </br> Die Sonne geht südlich des südlichen Polarkreises nicht mehr unter - Polartag.")
-        elif 2.9 < t < 3.3:
-            msg = "<b>Tagundnachtgleiche (März):</b> " + ("Sonne im Zenit über dem Äquator - Frühlingsanfang. Weltweit gleiche Tageslänge." if state['focus_north'] else "Sonne im Zenit über dem Äquator - Herbstanfang. Weltweit gleiche Tageslänge.")
-        elif 4.5 < t < 4.9:
-            msg = "<b>Sonnenwende (Juni):</b> " + ("Sonne im Zenit über dem nördlichen Wendekreis - Kürzeste Nacht, längster Tag. </br> Die Sonne geht nördlich des nördlichen Polarkreises nicht mehr unter - Polartag." if state['focus_north'] else "Sonne im Zenit über dem nördlichen Wendekreis - Kürzester Tag, längste Nacht. </br> Die Sonne geht südlich des südlichen Polarkreises nicht mehr auf - Polarnacht.")
-        else:
-            msg = "Die Erde bewegt sich weiter..."
-        
-        info_box.text = f"<div style='background-color: #1a1a1a; color: #ffffff; padding: 15px; border-radius: 8px; border: 1px solid #444; font-family: sans-serif;'>{msg}</div>"
+    msg = ""
+    if 0 <= t < 0.2 or t > 6.1:
+        msg = "<b>Tagundnachtgleiche (September):</b> " + ("Sonne im Zenit über dem Äquator - Herbstanfang. Weltweit gleiche Tageslänge." if state['focus_north'] else "Sonne im Zenit über dem Äquator - Frühlingsanfang. Weltweit gleiche Tageslänge.")
+    elif 1.3 < t < 1.8:
+        msg = "<b>Sonnenwende (Dezember):</b> " + ("Sonne im Zenit über dem südlichen Wendekreis - Kürzester Tag, längste Nacht. </br> Die Sonne geht nördlich des nördlichen Polarkreises nicht mehr auf - Polarnacht." if state['focus_north'] else "Sonne im Zenit über dem südlichen Wendekreis - Kürzeste Nacht, längster Tag. </br> Die Sonne geht südlich des südlichen Polarkreises nicht mehr unter - Polartag.")
+    elif 2.9 < t < 3.3:
+        msg = "<b>Tagundnachtgleiche (März):</b> " + ("Sonne im Zenit über dem Äquator - Frühlingsanfang. Weltweit gleiche Tageslänge." if state['focus_north'] else "Sonne im Zenit über dem Äquator - Herbstanfang. Weltweit gleiche Tageslänge.")
+    elif 4.5 < t < 4.9:
+        msg = "<b>Sonnenwende (Juni):</b> " + ("Sonne im Zenit über dem nördlichen Wendekreis - Kürzeste Nacht, längster Tag. </br> Die Sonne geht nördlich des nördlichen Polarkreises nicht mehr unter - Polartag." if state['focus_north'] else "Sonne im Zenit über dem nördlichen Wendekreis - Kürzester Tag, längste Nacht. </br> Die Sonne geht südlich des südlichen Polarkreises nicht mehr auf - Polarnacht.")
+    else:
+        msg = "Die Erde bewegt sich weiter..."
+    
+    info_box.text = f"<div style='background-color: #1a1a1a; color: #ffffff; padding: 15px; border-radius: 8px; border: 1px solid #444; font-family: sans-serif;'>{msg}</div>"
 
 # ******************************************************************
