@@ -21,7 +21,7 @@ title_html = """
             border-radius: 8px; border: 1px solid #444; font-family: sans-serif; 
             box-sizing: border-box; margin-bottom: 10px; overflow-x: hidden;'>
     
-    <h1 style='margin: 0 0 10px 0; color: #ffcc00; font-size: 22px;'>SeasonSim v0.9a</h1>
+    <h1 style='margin: 0 0 10px 0; color: #ffcc00; font-size: 22px;'>Jahreszeiten-Simulator v0.9a</h1>
 
     <details open style='width: 100%; background-color: #1a1a1a; color: #e0e0e0; padding: 10px; 
                          border-radius: 8px; border: 1px solid #444; cursor: pointer; 
@@ -36,13 +36,18 @@ title_html = """
             über das Jahr auf den Halbkugeln unterschiedlich. Durch diesen von uns als "Sonnenstand" 
             wahrgenommenen Effekt entstehen die Jahreszeiten.
             <br><br>
-            Der Bereich zwischen dem nördlichen und südlichen <b>Wendekreis</b> (gelbe Linien) 
+            Der Bereich zwischen dem nördlichen und südlichen <b>Wendekreis</b> (gelbe Breitenkreise bei ca. 23° Nord/Süd) 
             wird <b>Tropen</b> genannt. Zur Juni-Sonnenwende steht die Sonne über dem nördlichen 
-            Wendekreis im Zenit - auf der Nordhalbkugel beginnt der Sommer. Zur Dezember-Sonnenwende 
-            über dem südlichen Wendekreis.
+            Wendekreis im Zenit (das heißt senkrecht über dem Beobachter) - auf der Nordhalbkugel beginnt der Sommer. Zur Dezember-Sonnenwende 
+            steht die Sonne dann über dem südlichen Wendekreis im Zenit - auf der Nordhalbkugel ist Winterbeginn. In den Tropen ist die Tageslänge
+            das ganze Jahr über relativ gleichbleibend. Daher gibt es dort keine ausgeprägten Jahreszeiten - das Jahr wird in eine Regen- und 
+            eine Trockenzeit eingeteilt.
             <br><br>
-            An den <b>Polarkreisen</b> (hellblaue Linien) geht die Sonne zu den Sonnenwenden 
-            gerade nicht mehr auf bzw. unter (Polarnacht/Polartag).
+            An den <b>Polarkreisen</b> (hellblaue Linien bei jeweils ca. 66° Nord/Süd) geht die Sonne zu den Sonnenwenden 
+            gerade nicht mehr auf bzw. unter (Polarnacht/Polartag). Zum Beispiel herrscht zur Dezember-Sonnenwende nördlich des nördlichen
+            Polarkreises Polarnacht. Zur Juni-Sonnenwende hingegen ist die Sonne dort 24 Stunden am Tag oberhalb des Horizonts - es herrscht Polartag.
+            <br><br>
+            Die Sonnenwenden werden auch als <b>Solstitien</b> (Singular Solstitium), und die Tagundnachtgleichen als <b>Äquinoktien</b> (Singular Äquinoktium) bezeichnet.
         </div>
     </details>
 
@@ -64,14 +69,17 @@ title_html = """
             <div style='flex: 1; min-width: 200px; max-width: 100%; white-space: normal;'>
                 <b style="color: #ffcc00;">Interaktion:</b><br>
                 • <b>Klick auf Erde/Sonne</b>: Fokus setzen<br>
-                • <b>Linien</b>: Einblenden von Äquator/Wendekreisen<br>
-                • <b>Springe zu</b>: Vordefinierte Daten wählen
+                • <b>Linien</b>: Einblenden von Äquator, Wendekreisen und Polarkreisen<br>
+                • <b>Springe zu</b>: Simulation auf den entsprechenden Zeitpunkt setzen
             </div>
 
         </div>
-        <div style="width: 100%; margin-top: 10px; font-size: 0.85em; color: #bbb; border-top: 1px solid #333; padding-top: 5px;">
-            Zur besseren Übersicht: Simulation pausieren, dann die Ansicht auf die Erde zentrieren. 
+        <div style="width: 100%; margin-top: 10px; font-size: 1em; color: #bbb; border-top: 1px solid #333; padding-top: 5px;">
+            Zur einfacheren Übersicht Simulation pausieren, dann die Ansicht auf die Erde zentrieren. 
             Nun kann man mit "Springe zu" die Positionen wechseln.
+
+            Aus Gründen der Sichtbarkeit ist die Rotationsgeschwindigkeit der Erde im Modell etwa achtmal langsamer als in der Realität.
+            Erde und Sonne sind im Verhältnis nicht maßstabsgetreu. Die perfekte Kreisbahn des Erdorbits ist ebenfalls eine Vereinfachung.
         </div>
     </details>
 </div>
@@ -95,7 +103,7 @@ state = {
     'theta': pi
 }
 ORBIT_RADIUS = 50
-DAYS_PER_YEAR = 40 
+DAYS_PER_YEAR = 45 
 
 # ******************************************************************
 #  Functions setup
