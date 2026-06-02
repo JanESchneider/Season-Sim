@@ -74,7 +74,9 @@ title_html = """
             </div>
 
         </div>
-        <div style="width: 100%; margin-top: 10px; font-size: 1em; color: #bbb; border-top: 1px solid #333; padding-top: 5px;">
+        <div style='width: 100%; white-space: normal; overflow-wrap: break-word; 
+                    word-wrap: break-word; word-break: break-word; line-height: 1.4; 
+                    margin-top: 10px; display: block;'>
             Zur einfacheren Übersicht Simulation pausieren, dann die Ansicht auf die Erde zentrieren. 
             Nun kann man mit "Springe zu" die Positionen wechseln.
 
